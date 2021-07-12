@@ -4,10 +4,13 @@ from aiohttp.web_exceptions import HTTPBadRequest
 from bson import ObjectId
 from bson.objectid import InvalidId
 from umongo import ValidationError
+import json
 from . import services, schemas
 
 routes = web.RouteTableDef()
 logger = logging.getLogger(__name__)
+
+# TODO: через curl запросы работают
 
 
 def validate_object_id(object_id: str) -> ObjectId:
@@ -18,11 +21,25 @@ def validate_object_id(object_id: str) -> ObjectId:
         raise HTTPBadRequest(reason='Invalid id.')
     return object_id
 
+
 @routes.get('/users/top')
 async def list_top_users(request: web.Request) -> web.Response:
     schema = schemas.UserNoPassSchema()
     users = await services.list_top_users()
     return web.json_response([schema.dump(user)[0] async for user in users], status=200)
+
+# TODO: пагинация, проверка author_id
+@routes.post('/recipes/list')
+async def list_recipes(request: web.Request) -> web.Response:
+    try:
+        schema = schemas.ListRecipeParamsSchema(strict=True)
+        data = schema.load(await request.json()).data
+    except ValidationError as error:
+        logger.error('validation error', extra={'errors': error.messages})
+        raise HTTPBadRequest(reason=error.messages)
+    recipes = await services.list_recipes(data)
+    schema_recipe = schemas.RecipeNoStepsSchema()
+    return web.json_response([schema_recipe.dump(recipe)[0] async for recipe in recipes], status=200)
 
 @routes.post('/users')
 async def create_user(request: web.Request) -> web.Response:
@@ -54,6 +71,13 @@ async def get_user(request: web.Request) -> web.Response:
     user = await services.find_user(user_id)
     schema = schemas.UserNoPassSchema()
     return web.json_response(schema.dump(user)[0], status=200)
+
+# TODO: идентификатор, имя и статус добавившего пользователя
+@routes.get(r'/recipes/{recipe_id:\w{24}}')
+async def get_recipe(request: web.Request) -> web.Response:
+    recipe_id = validate_object_id(request.match_info['recipe_id'])
+    recipe = await services.find_user_recipe(recipe_id)
+    return web.json_response(recipe.dump(), status=200)
 
 '''
 @routes.get(r'/items/{item_id:\w{24}}')

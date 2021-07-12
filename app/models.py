@@ -1,6 +1,6 @@
 from aiohttp import web
 from datetime import datetime
-from umongo import Document, fields
+from umongo import Document, fields, EmbeddedDocument
 from .db import instance
 
 
@@ -19,7 +19,7 @@ class Recipe(Document):
     created_date = fields.DateTimeField(default=datetime.utcnow)
     name = fields.StrField(required=True)
     description = fields.StrField()
-    cooking_steps = fields.ListField(fields.StrField(), required=True)
+    cooking_steps = fields.ListField(fields.StrField())
     result_photo = fields.StrField()
     dish_type = fields.StrField(required=True)
     likes = fields.ListField(fields.ObjectIdField())

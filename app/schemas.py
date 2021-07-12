@@ -1,4 +1,4 @@
-from marshmallow import Schema
+from marshmallow import Schema, fields
 from .models import User, Recipe
 
 
@@ -9,6 +9,22 @@ class UserNoPassSchema(UserSchema):
     class Meta:
         exclude = ['password']
 
+class RecipeNoStepsSchema(RecipeSchema):
+    class Meta:
+        exclude = ['cooking_steps']
+
+class ListRecipeParamsSchema(Schema):
+    hashtag = fields.Str()
+    name_part = fields.Str()
+    author_id = fields.Str()
+    with_photo = fields.Bool()
+    sort_by = fields.Str()
+    sort_order = fields.Str()
+
+
+class UserRecipeSchema(UserSchema):
+    class Meta:
+        exclude = ['password', 'favorites', 'recipes_count']
 
 '''
 class UpdateItemSchema(ItemSchema):
