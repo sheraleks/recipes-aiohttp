@@ -1,19 +1,15 @@
-import logging
 from aiohttp import web
 from .db import setup_mongo
 from .models import ensure_indexes
 from .views import routes
 from .config import Config
 
-logger = logging.getLogger(__name__)
 
-
-def init(config: Config) -> web.Application:
-    logger.info(f'init app: {config}')
+def init(config):
     app = web.Application()
     app['config'] = config
     app.on_startup.append(setup_mongo)
-    app.on_startup.append(ensure_indexes)  # in production should be in CD stage
+    app.on_startup.append(ensure_indexes)
     app.add_routes(routes)
     return app
 

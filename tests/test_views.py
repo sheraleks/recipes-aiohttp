@@ -1,127 +1,73 @@
-from bson import ObjectId
 from aiohttp.test_utils import unittest_run_loop
-from app.models import Item
+from app.models import User, Recipe
 from tests import AppTestCase
 
-'''
-class ItemListTestCase(AppTestCase):
+
+class UserListTestCase(AppTestCase):
 
     @unittest_run_loop
-    async def test_list(self):
-        item1 = Item(name='item1')
-        await item1.commit()
-        item2 = Item(name='item2')
-        await item2.commit()
+    async def test_list_users(self):
+        user1 = User(nickname='test1', password='test1')
+        await user1.commit()
+        user2 = User(nickname='test2', password='test2')
+        await user2.commit()
 
-        resp = await self.client.get("/items")
+        resp = await self.client.get("/users")
         assert resp.status == 200
-        items = await resp.json()
-        assert len(items) == 2
+        users = await resp.json()
+        assert len(users) == 2
 
 
-class ItemCreateTestCase(AppTestCase):
+class RecipeListTestCase(AppTestCase):
 
     @unittest_run_loop
-    async def test_create_item(self):
+    async def test_list_users(self):
+        author_id = '60ead8d8910b3793218d65d7'
+        recipe1 = Recipe(author_id=author_id, name='уха', dish_type='суп')
+        await recipe1.commit()
+
+        recipe2 = Recipe(author_id=author_id, name='свинина', dish_type='второе')
+        await recipe2.commit()
+
+        resp = await self.client.get("/recipes")
+        assert resp.status == 200
+        recipes = await resp.json()
+        assert len(recipes) == 2
+
+
+class UserCreateTestCase(AppTestCase):
+
+    @unittest_run_loop
+    async def test_create_user(self):
         data = {
-            'name': 'item1'
+            'nickname': 'test3',
+            'password': 'test3'
         }
-        resp = await self.client.post("/items", json=data)
+        resp = await self.client.post("/users", json=data)
         assert resp.status == 201
 
-        item = await Item.find_one({})
-        assert item.name == data['name']
+        user = await User.find_one({'nickname': data['nickname']})
+        assert user.nickname == data['nickname']
+
+
+class UserGetTestCase(AppTestCase):
 
     @unittest_run_loop
-    async def test_bad_request(self):
-        data = {
-            'bad_key': 'item1'
-        }
-        resp = await self.client.post(f"/items", json=data)
-        assert resp.status == 400
+    async def test_get_user(self):
+        user1 = User(nickname='test21', password='test1')
+        await user1.commit()
+
+        found = await User.find_one({'nickname': user1.nickname})
+        assert found.nickname == user1.nickname
 
 
-class ItemUpdateTestCase(AppTestCase):
-
-    @unittest_run_loop
-    async def test_update(self):
-        item = Item(name='test')
-        await item.commit()
-        data = {
-            'name': 'item1'
-        }
-        resp = await self.client.put(f"/items/{item.id}", json=data)
-        assert resp.status == 200
-
-        await item.reload()
-        assert item.name == data['name']
-        assert item.updated_time
+class RecipeGetTestCase(AppTestCase):
 
     @unittest_run_loop
-    async def test_not_found(self):
-        data = {
-            'name': 'item1'
-        }
-        resp = await self.client.put(f"/items/{ObjectId()}", json=data)
-        assert resp.status == 404
+    async def test_get_user(self):
+        author_id = '60ead8d8910b3793218d65d7'
+        recipe1 = Recipe(author_id=author_id, name='уха', dish_type='суп')
+        await recipe1.commit()
 
-    @unittest_run_loop
-    async def test_bad_id(self):
-        resp = await self.client.put(f"/items/{'x'*24}", json={})
-        assert resp.status == 400
-
-    @unittest_run_loop
-    async def test_bad_request(self):
-        item = Item(name='test')
-        await item.commit()
-        data = {
-            'bad_key': 'item1'
-        }
-        resp = await self.client.put(f"/items/{item.id}", json=data)
-        assert resp.status == 400
-
-
-class ItemDeleteTestCase(AppTestCase):
-
-    @unittest_run_loop
-    async def test_delete(self):
-        item = Item(name='item1')
-        await item.commit()
-        resp = await self.client.delete(f"/items/{item.id}")
-        assert resp.status == 204
-
-        assert not (await Item.find_one({'_id': item.id}))
-
-    @unittest_run_loop
-    async def test_not_found(self):
-        resp = await self.client.delete(f"/items/{ObjectId()}")
-        assert resp.status == 404
-
-    @unittest_run_loop
-    async def test_bad_id(self):
-        resp = await self.client.delete(f"/items/{'x'*24}")
-        assert resp.status == 400
-
-
-class ItemGetTestCase(AppTestCase):
-
-    @unittest_run_loop
-    async def test_get(self):
-        item = Item(name='item1')
-        await item.commit()
-        resp = await self.client.get(f"/items/{item.id}")
-        assert resp.status == 200
-        data = await resp.json()
-        assert data['id'] == str(item.id)
-        assert data['name'] == item.name
-
-    @unittest_run_loop
-    async def test_not_found(self):
-        resp = await self.client.get(f"/items/{ObjectId()}")
-        assert resp.status == 404
-
-    @unittest_run_loop
-    async def test_bad_id(self):
-        resp = await self.client.get(f"/items/{'x'*24}")
-        assert resp.status == 400
-'''
+        found = await Recipe.find_one({'_id': recipe1.id})
+        assert found.id == recipe1.id

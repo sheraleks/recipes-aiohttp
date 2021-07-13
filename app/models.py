@@ -28,6 +28,6 @@ class Recipe(Document):
     status = fields.StrField(default='active')
 
 
-async def ensure_indexes(app: web.Application) -> None:
+async def ensure_indexes(app):
     await User.ensure_indexes()
     await Recipe.ensure_indexes()

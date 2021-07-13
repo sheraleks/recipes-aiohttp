@@ -1,4 +1,6 @@
 aiohttp==3.5.4
+aiohttp_security==0.3.0
+aiohttp_session==2.7.0
 motor==2.0.0
 umongo==2.0.3
 pymongo==3.8.0
@@ -6,8 +8,6 @@ dnspython==1.16.0
 python-json-logger==0.1.11
 
 # tests
-mypy==0.711
-flake8==3.7.7
 pytest==5.0.0
 pytest-cov==2.7.1
 
