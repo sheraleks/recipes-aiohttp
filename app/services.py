@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import AsyncIterable, Dict
 from aiohttp.web_exceptions import HTTPNotFound
 from bson import ObjectId
-from .models import User, Recipe
+from .models import User, Recipe, RecipeWithUser
 from pymongo import DESCENDING, ASCENDING
 
 # TODO: Проверка лайков
@@ -35,8 +35,32 @@ async def find_recipe(recipe_id):
     recipe = await Recipe.find_one({'_id': recipe_id, 'status': 'active'})
     if not recipe:
         raise HTTPNotFound()
-    return recipe
+    user = await find_user(recipe.author_id)
+    recipe_with_user = RecipeWithUser()
+    recipe_with_user.author_id = user.id
+    recipe_with_user.author_nickname = user.nickname
+    recipe_with_user.status = user.status
+    recipe_with_user.created_date = recipe.created_date
+    recipe_with_user.name = recipe.name
+    if recipe.description is not None:
+        recipe_with_user.description = recipe.description
+    if recipe.cooking_steps is not None:
+        recipe_with_user.cooking_steps = recipe.cooking_steps
+    if recipe.result_photo is not None:
+        recipe_with_user.result_photo = recipe.result_photo
+    if recipe.dish_type is not None:
+        recipe_with_user.dish_type = recipe.dish_type
+    if recipe.likes is not None:
+        recipe_with_user.likes = recipe.likes
+    if recipe.likes_count is not None:
+        recipe_with_user.likes_count = recipe.likes_count
+    if recipe.hashtags is not None:
+        recipe_with_user.hashtags = recipe.hashtags
+    recipe_with_user.status = recipe.status
+    return recipe_with_user
 
+
+# TODO: проверка корректности передачи параметров
 async def list_recipes(data):
     filter = {'status': 'active'}
     if 'hashtag' in data: filter['hashtags'] = data['hashtag']

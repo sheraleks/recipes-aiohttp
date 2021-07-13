@@ -28,7 +28,7 @@ async def list_top_users(request: web.Request) -> web.Response:
     users = await services.list_top_users()
     return web.json_response([schema.dump(user)[0] async for user in users], status=200)
 
-# TODO: пагинация, проверка author_id
+# TODO: пагинация, проверка author_id, get запрос
 @routes.post('/recipes/list')
 async def list_recipes(request: web.Request) -> web.Response:
     try:
@@ -72,12 +72,12 @@ async def get_user(request: web.Request) -> web.Response:
     schema = schemas.UserNoPassSchema()
     return web.json_response(schema.dump(user)[0], status=200)
 
-# TODO: идентификатор, имя и статус добавившего пользователя
 @routes.get(r'/recipes/{recipe_id:\w{24}}')
 async def get_recipe(request: web.Request) -> web.Response:
     recipe_id = validate_object_id(request.match_info['recipe_id'])
-    recipe = await services.find_user_recipe(recipe_id)
-    return web.json_response(recipe.dump(), status=200)
+    recipe_with_user = await services.find_recipe(recipe_id)
+    schema = schemas.RecipeWithUserSchema()
+    return web.json_response(schema.dump(recipe_with_user)[0], status=200)
 
 '''
 @routes.get(r'/items/{item_id:\w{24}}')

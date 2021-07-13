@@ -27,6 +27,24 @@ class Recipe(Document):
     hashtags = fields.ListField(fields.StrField())
     status = fields.StrField(default='active')
 
+# TODO: inheritance
+@instance.register
+class RecipeWithUser(Document):
+    author_id = fields.ObjectIdField()
+    author_nickname = fields.StrField()
+    author_status = fields.StrField()
+    created_date = fields.DateTimeField()
+    name = fields.StrField()
+    description = fields.StrField()
+    cooking_steps = fields.ListField(fields.StrField())
+    result_photo = fields.StrField()
+    dish_type = fields.StrField()
+    likes = fields.ListField(fields.ObjectIdField())
+    likes_count = fields.IntField()
+    hashtags = fields.ListField(fields.StrField())
+    status = fields.StrField()
+
+
 
 async def ensure_indexes(app: web.Application) -> None:
     await User.ensure_indexes()
