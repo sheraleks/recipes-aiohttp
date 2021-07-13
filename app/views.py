@@ -39,7 +39,9 @@ async def list_recipes(request: web.Request) -> web.Response:
         raise HTTPBadRequest(reason=error.messages)
     recipes = await services.list_recipes(data)
     schema_recipe = schemas.RecipeNoStepsSchema()
-    return web.json_response([schema_recipe.dump(recipe)[0] async for recipe in recipes], status=200)
+    recipes = [schema_recipe.dump(recipe)[0] async for recipe in recipes]
+
+    return web.json_response({'recipes': recipes, 'page': 1}, status=200)
 
 @routes.post('/users')
 async def create_user(request: web.Request) -> web.Response:
@@ -75,9 +77,13 @@ async def get_user(request: web.Request) -> web.Response:
 @routes.get(r'/recipes/{recipe_id:\w{24}}')
 async def get_recipe(request: web.Request) -> web.Response:
     recipe_id = validate_object_id(request.match_info['recipe_id'])
-    recipe_with_user = await services.find_recipe(recipe_id)
-    schema = schemas.RecipeWithUserSchema()
-    return web.json_response(schema.dump(recipe_with_user)[0], status=200)
+    recipe = await services.find_recipe(recipe_id)
+    user = await services.find_user(recipe.author_id)
+    recipe_schema = schemas.RecipeNoStepsSchema()
+    user_schema = schemas.UserRecipeSchema()
+    recipe = recipe_schema.dump(recipe)[0]
+    recipe['author'] = user_schema.dump(user)[0]
+    return web.json_response(recipe, status=200)
 
 '''
 @routes.get(r'/items/{item_id:\w{24}}')
