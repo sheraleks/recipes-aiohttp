@@ -69,7 +69,7 @@ async def get_recipe(request):
     recipe_id = validate_object_id(request.match_info['recipe_id'])
     recipe = await services.find_recipe(recipe_id)
     user = await services.find_user(recipe.author_id)
-    recipe_schema = schemas.RecipeNoStepsSchema()
+    recipe_schema = schemas.RecipeSchema()
     user_schema = schemas.UserRecipeSchema()
     recipe = recipe_schema.dump(recipe)[0]
     recipe['author'] = user_schema.dump(user)[0]

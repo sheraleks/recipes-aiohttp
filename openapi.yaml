@@ -1,0 +1,234 @@
+  openapi: 3.0.0
+  info:
+    title: Recipes API
+
+  paths:
+    /users:
+      get:
+        summary: Returns top10 users sorted by published recipes.
+        responses:
+          '200':
+            description: A JSON array of user objects
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: ObjectId
+                        example: 60ead8d8910b3793218d65d7
+                      nickname:
+                        type: string
+                        example: aleks
+                      status:
+                        type: string
+                        example: active
+                      recipes_count:
+                        type: integer
+                        fromat: int64
+                        example: 4
+      post:
+        summary: Creates new user
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+                    example: aleks
+                    required: true
+                  password:
+                    type: string
+                    example: pass
+                    required: true
+                  status:
+                    type: string
+                    example: active
+                  recipes_count:
+                    type: integer
+                    fromat: int64
+                    example: 4
+        responses:
+          '201':
+            description: OK
+    /users/{user_id}:
+      get:
+        summary: Returns a user by ID.
+        parameters:
+          - name: user_id
+            required: true
+            schema:
+              type: string
+              format: ObjectId
+        responses:
+          '200':
+            description: A user object.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: ObjectId
+                    nickname:
+                      type: string
+                      example: aleks
+                    password:
+                      type: string
+                      example: pass
+                    status:
+                      type: string
+                      example: active
+                    recipes_count:
+                      type: integer
+                      fromat: int64
+                      example: 4
+          '404':
+            description: A user with the specified ID was not found.
+
+    /recipes:
+      get:
+        summary: Returns sorted/filtered recipes
+        parameters:
+          - name: hashtag
+            description: Filtering by hashtag
+            schema:
+              type: string
+          - name: name_part
+            description: Filtering by name part
+            schema:
+              type: string
+          - name: author_id
+            description: Filtering by author_id
+            schema:
+              type: string
+          - name: with_photo
+            description: Filtering by photo availability
+            schema:
+              type: string
+          - name: sort_by
+              description: Sorting by specific field
+              schema:
+                type: string
+          - name: sort_order
+              description: Sort order
+              schema:
+                type: string
+                example: ascending
+        responses:
+          '200':
+            description: A JSON array of user objects
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: ObjectId
+                        example: 60ead8d8910b3793218d65d7
+                      nickname:
+                        type: string
+                        example: aleks
+                      status:
+                        type: string
+                        example: active
+                      recipes_count:
+                        type: integer
+                        fromat: int64
+                        example: 4
+      post:
+        summary: Creates new recipe
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    author_id:
+                      type: string
+                      required: true
+                    name:
+                      type: string
+                      required: true
+                    dish_type:
+                      type: string
+                      required: true
+                    description:
+                      type: string
+                    cooking_steps:
+                      type: array
+                      items:
+                        type: string
+                    result_photo:
+                      type: string
+                    hashtags:
+                      type: array
+                        items:
+                          type: string
+
+
+          responses:
+            '201':
+              description: OK
+
+    /recipes/{recipe_id}:
+      get:
+        summary: Returns a recipe by ID.
+        parameters:
+          - name: recipe_id
+            required: true
+            schema:
+              type: string
+              format: ObjectId
+        responses:
+          '200':
+            description: A recipe object with author info.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    author_id:
+                      type: string
+                      required: true
+                    name:
+                      type: string
+                      required: true
+                    dish_type:
+                      type: string
+                      required: true
+                    description:
+                      type: string
+                    cooking_steps:
+                      type: array
+                      items:
+                        type: string
+                    result_photo:
+                      type: string
+                    hashtags:
+                      type: array
+                        items:
+                          type: string
+                    likes:
+                      type: array
+                      description: Array of liked users
+                      items:
+                        type: string
+                        format: ObjectId
+                    likes_count:
+                      type: int
+                    status:
+                      type: string
+
+          '404':
+            description: A user with the specified ID was not found.
+
