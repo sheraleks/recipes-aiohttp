@@ -19,6 +19,7 @@ run_in_docker   run in docker
 ```
 
 ## System interaction examples using HTTPie
+OpenAPI specification in openapi.yaml
 ### Create user
 ```
 http POST http://localhost:8080/users nickname=aleks password=aleks
